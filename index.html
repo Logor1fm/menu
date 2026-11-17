@@ -1,0 +1,2111 @@
+<!DOCTYPE html>
+<html lang="kk" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DÄM CAFÉ — Заманауи мәзір және жеткізу</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        cream: '#FAF9F6',
+                        brand: {
+                            50: '#fff7ed',
+                            100: '#ffedd5',
+                            200: '#fed7aa',
+                            500: '#f97316',
+                            600: '#ea580c',
+                            700: '#c2410c',
+                        },
+                        slateDark: '#1E293B'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-up {
+            animation: fadeSlideUp 0.25s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="bg-cream text-slateDark font-sans antialiased selection:bg-brand-600 selection:text-white">
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed top-4 right-4 z-[100] flex flex-col gap-2 pointer-events-none max-w-sm w-full px-4 sm:px-0"></div>
+
+    <!-- ========================================== -->
+    <!-- 1. CLIENT VIEW (КЛИЕНТТЕР БЕТІ)            -->
+    <!-- ========================================== -->
+    <div id="client-view" class="min-h-screen flex flex-col">
+        
+        <!-- Top Header -->
+        <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-stone-200/80 shadow-xs">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-3">
+                
+                <!-- Brand Logo & Name -->
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-br from-brand-500 to-brand-600 flex items-center justify-center text-white shadow-md shadow-brand-600/20 shrink-0">
+                        <i data-lucide="utensils-crossed" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <div class="flex items-center gap-2">
+                            <h1 id="header-cafe-name" class="text-base sm:text-xl font-extrabold tracking-tight text-slateDark truncate">DÄM CAFÉ</h1>
+                            <span id="header-status-badge" class="hidden md:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                <span id="header-hours-text">Ашық • 09:00 - 23:00</span>
+                            </span>
+                        </div>
+                        <p id="header-cafe-tagline" class="text-xs text-stone-500 truncate">Дәмді тағамдар • Жылдам жеткізу</p>
+                    </div>
+                </div>
+
+                <!-- Desktop Search -->
+                <div class="hidden lg:flex flex-1 max-w-md mx-4">
+                    <div class="relative w-full">
+                        <i data-lucide="search" class="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                        <input type="text" id="desktop-search-input" placeholder="Тағам іздеу..." 
+                            class="w-full pl-10 pr-4 py-2.5 bg-stone-100 hover:bg-stone-200/70 focus:bg-white border border-transparent focus:border-brand-600 rounded-2xl text-sm transition-all outline-none">
+                    </div>
+                </div>
+
+                <!-- Right Header Actions -->
+                <div class="flex items-center gap-2 sm:gap-2.5 shrink-0">
+                    <!-- Direct WhatsApp Header Link -->
+                    <a id="header-whatsapp-link" href="https://wa.me/77001234567" target="_blank" rel="noopener noreferrer"
+                        class="flex items-center gap-1.5 px-3 py-2.5 rounded-2xl text-xs sm:text-sm font-semibold bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 transition">
+                        <i data-lucide="message-circle" class="w-4 h-4 text-emerald-600"></i>
+                        <span class="hidden sm:inline">WhatsApp</span>
+                    </a>
+
+                    <!-- Admin Button -->
+                    <button type="button" data-action="open-admin-login"
+                        class="relative flex items-center gap-1.5 px-3 py-2.5 rounded-2xl text-xs sm:text-sm font-semibold text-stone-700 hover:bg-stone-100 border border-stone-200 transition">
+                        <i data-lucide="lock" class="w-4 h-4 text-brand-600"></i>
+                        <span class="hidden sm:inline">Админ</span>
+                        <span id="client-new-orders-badge" class="hidden absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow">0</span>
+                    </button>
+
+                    <!-- Cart Button -->
+                    <button type="button" data-action="open-cart"
+                        class="flex items-center gap-2 bg-slateDark hover:bg-slate-800 text-white px-3.5 sm:px-4 py-2.5 rounded-2xl font-semibold text-sm shadow-sm transition active:scale-95">
+                        <div class="relative">
+                            <i data-lucide="shopping-bag" class="w-5 h-5 text-brand-500"></i>
+                            <span id="header-cart-badge" class="hidden absolute -top-2 -right-2 bg-brand-600 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">0</span>
+                        </div>
+                        <span id="header-cart-total" class="hidden sm:inline">0 ₸</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile & Tablet Search Bar -->
+            <div class="lg:hidden px-4 pb-3">
+                <div class="relative w-full">
+                    <i data-lucide="search" class="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                    <input type="text" id="mobile-search-input" placeholder="Тағам іздеу..." 
+                        class="w-full pl-10 pr-4 py-2 bg-stone-100 focus:bg-white border border-transparent focus:border-brand-600 rounded-xl text-sm transition-all outline-none">
+                </div>
+            </div>
+        </header>
+
+        <!-- Hero Banner -->
+        <section class="bg-slateDark text-white relative overflow-hidden">
+            <div class="absolute inset-0 opacity-15 bg-[radial-gradient(#EA580C_1px,transparent_1px)] [background-size:20px_20px]"></div>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-7 sm:py-10 relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+                <div class="text-center md:text-left max-w-xl">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-600/20 text-brand-200 text-xs font-semibold mb-3 border border-brand-500/30">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span id="hero-hours-badge">Ашық • 09:00 - 23:00</span>
+                    </div>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight mb-2">
+                        Сүйікті тағамдарыңызға оңай тапсырыс беріңіз
+                    </h2>
+                    <p class="text-slate-300 text-sm">
+                        Ыстық тағамдар, балғын сусындар және тәтті десерттер. Сайт арқылы таңдап, бір батырмамен тапсырыс жіберіңіз.
+                    </p>
+                </div>
+
+                <!-- Quick WhatsApp Card -->
+                <div class="bg-white/10 backdrop-blur-sm border border-white/15 p-4 rounded-2xl flex items-center gap-4 shrink-0 w-full md:w-auto justify-between md:justify-start">
+                    <div class="flex items-center gap-3">
+                        <div class="w-11 h-11 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                            <i data-lucide="phone-call" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <p class="text-[11px] text-slate-300">Жылдам байланыс</p>
+                            <p id="hero-phone-text" class="text-sm sm:text-base font-bold text-white">+7 (700) 123-45-67</p>
+                        </div>
+                    </div>
+                    <a id="hero-whatsapp-btn" href="https://wa.me/77001234567" target="_blank" rel="noopener noreferrer"
+                        class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl transition shadow-sm">
+                        Жазу
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sticky Category Filter Pills -->
+        <div class="sticky top-16 sm:top-20 z-30 bg-cream/95 backdrop-blur-md border-b border-stone-200/80 py-3">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div id="category-filter-bar" class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-0.5">
+                    <!-- Dynamic Category Pills -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Menu Section -->
+        <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+            <div class="flex items-center justify-between mb-6">
+                <h3 id="menu-section-title" class="text-xl sm:text-2xl font-extrabold text-slateDark">Барлық мәзір</h3>
+                <span id="menu-items-count" class="text-xs sm:text-sm font-semibold text-stone-500 bg-white px-3 py-1 rounded-full border border-stone-200">0 тағам</span>
+            </div>
+
+            <!-- Menu Cards Grid -->
+            <div id="menu-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 sm:gap-6">
+                <!-- Dynamic Food Cards -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="menu-empty-state" class="hidden text-center py-16 bg-white rounded-3xl border border-stone-200/80 shadow-xs">
+                <div class="w-16 h-16 bg-stone-100 rounded-full flex items-center justify-center mx-auto mb-4 text-stone-400">
+                    <i data-lucide="search-x" class="w-8 h-8"></i>
+                </div>
+                <h4 class="text-lg font-bold text-slateDark mb-1">Ештеңе табылмады</h4>
+                <p class="text-sm text-stone-500 mb-5">Іздеу сөзін өзгертіп көріңіз немесе барлық мәзірді ашыңыз.</p>
+                <button type="button" data-action="reset-filters" class="px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-sm font-semibold transition">
+                    Барлық мәзірді көрсету
+                </button>
+            </div>
+        </main>
+
+        <!-- Floating Mobile Cart Bar -->
+        <div id="mobile-cart-bar" class="hidden sm:hidden fixed bottom-5 left-4 right-20 z-30">
+            <button type="button" data-action="open-cart" class="w-full bg-slateDark text-white px-4 py-3.5 rounded-2xl shadow-xl flex items-center justify-between border border-white/10 active:scale-[0.98] transition">
+                <div class="flex items-center gap-2.5">
+                    <span id="mobile-cart-count" class="bg-brand-600 text-white text-xs font-bold px-2 py-0.5 rounded-lg">0</span>
+                    <span class="text-sm font-semibold">Себет</span>
+                </div>
+                <span id="mobile-cart-total" class="text-sm font-extrabold text-brand-200">0 ₸</span>
+            </button>
+        </div>
+
+        <!-- Floating WhatsApp Button (Bottom Right) -->
+        <a id="floating-whatsapp-btn" href="https://wa.me/77001234567" target="_blank" rel="noopener noreferrer" title="WhatsApp арқылы жазу"
+            class="fixed bottom-5 right-5 z-30 w-14 h-14 bg-emerald-600 hover:bg-emerald-500 text-white rounded-full shadow-xl shadow-emerald-600/30 flex items-center justify-center transition-transform hover:scale-105 active:scale-95">
+            <svg class="w-7 h-7 fill-current" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86s.274.072.376-.043c.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.1.824zm-3.423-14.416c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm.029 18.88c-1.161 0-2.305-.292-3.318-.844l-3.677.964.984-3.595c-.607-1.052-.927-2.246-.926-3.468.001-3.825 3.113-6.937 6.937-6.937 1.856.001 3.598.723 4.907 2.034 1.31 1.311 2.031 3.054 2.03 4.908-.001 3.825-3.113 6.938-6.937 6.938z"/>
+            </svg>
+        </a>
+
+        <!-- Footer -->
+        <footer class="bg-white border-t border-stone-200 mt-12 py-8">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-stone-500">
+                <div>
+                    <span id="footer-cafe-name" class="font-bold text-slateDark">DÄM CAFÉ</span> • Барлық құқықтар қорғалған.
+                </div>
+                <button type="button" data-action="open-admin-login" class="text-stone-500 hover:text-brand-600 flex items-center gap-1.5 font-medium transition">
+                    <i data-lucide="shield-check" class="w-4 h-4"></i>
+                    <span>Админ панель</span>
+                </button>
+            </div>
+        </footer>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- CART & CHECKOUT DRAWER                     -->
+    <!-- ========================================== -->
+    <div id="cart-backdrop" data-action="close-cart" class="hidden fixed inset-0 bg-black/50 backdrop-blur-xs z-50 transition-opacity"></div>
+    <aside id="cart-drawer" class="fixed top-0 right-0 bottom-0 w-full max-w-md bg-white z-50 shadow-2xl transform translate-x-full transition-transform duration-300 flex flex-col">
+        <!-- Drawer Header -->
+        <div class="px-6 py-4 border-b border-stone-100 flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+                <i data-lucide="shopping-bag" class="w-5 h-5 text-brand-600"></i>
+                <h3 class="text-lg font-extrabold text-slateDark">Себет және Тапсырыс</h3>
+            </div>
+            <button type="button" data-action="close-cart" class="p-2 rounded-xl text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+
+        <!-- Drawer Scrollable Body -->
+        <div class="flex-1 overflow-y-auto p-6">
+            <!-- Selected Items List -->
+            <div id="cart-items-list" class="space-y-3.5">
+                <!-- Dynamic Cart Items -->
+            </div>
+
+            <!-- Empty Cart State -->
+            <div id="cart-empty-state" class="hidden h-full flex flex-col items-center justify-center text-center py-12">
+                <div class="w-16 h-16 bg-brand-50 rounded-full flex items-center justify-center text-brand-600 mb-4">
+                    <i data-lucide="shopping-cart" class="w-8 h-8"></i>
+                </div>
+                <h4 class="text-lg font-bold text-slateDark mb-1">Себет бос</h4>
+                <p class="text-sm text-stone-500 max-w-xs mb-6">Мәзірден өзіңізге ұнаған тағамдарды таңдап қосыңыз.</p>
+                <button type="button" data-action="close-cart" class="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-2xl text-sm transition">
+                    Мәзірге өту
+                </button>
+            </div>
+
+            <!-- Order Checkout Form -->
+            <div id="checkout-section" class="hidden mt-7 pt-6 border-t border-stone-200">
+                <h4 class="text-base font-bold text-slateDark mb-4">Тапсырыс деректері</h4>
+                
+                <form id="checkout-form" class="space-y-4">
+                    <!-- Delivery vs Pickup -->
+                    <div>
+                        <label class="block text-xs font-semibold text-stone-600 mb-1.5">Алу тәсілі</label>
+                        <div class="grid grid-cols-2 gap-2 p-1 bg-stone-100 rounded-xl">
+                            <label class="cursor-pointer">
+                                <input type="radio" name="deliveryType" value="Жеткізу" checked class="peer sr-only">
+                                <div class="text-center py-2 px-3 rounded-lg text-xs sm:text-sm font-semibold text-stone-600 peer-checked:bg-white peer-checked:text-slateDark peer-checked:shadow-xs transition">
+                                    🚚 Жеткізу
+                                </div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="deliveryType" value="Өзім алып кетемін" class="peer sr-only">
+                                <div class="text-center py-2 px-3 rounded-lg text-xs sm:text-sm font-semibold text-stone-600 peer-checked:bg-white peer-checked:text-slateDark peer-checked:shadow-xs transition">
+                                    🏃 Өзім алып кетемін
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Customer Name -->
+                    <div>
+                        <label for="order-cust-name" class="block text-xs font-semibold text-stone-700 mb-1">Аты-жөніңіз *</label>
+                        <input type="text" id="order-cust-name" required placeholder="Мысалы: Асқар" 
+                            class="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-200 focus:border-brand-600 focus:bg-white rounded-xl text-sm outline-none transition">
+                    </div>
+
+                    <!-- Customer Phone -->
+                    <div>
+                        <label for="order-cust-phone" class="block text-xs font-semibold text-stone-700 mb-1">Телефон нөмірі *</label>
+                        <input type="tel" id="order-cust-phone" required placeholder="+7 (700) 000-00-00" 
+                            class="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-200 focus:border-brand-600 focus:bg-white rounded-xl text-sm outline-none transition">
+                    </div>
+
+                    <!-- Customer Address -->
+                    <div id="order-address-group">
+                        <label for="order-cust-address" class="block text-xs font-semibold text-stone-700 mb-1">Мекенжайыңыз *</label>
+                        <input type="text" id="order-cust-address" required placeholder="Көше, үй, пәтер, кіреберіс..." 
+                            class="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-200 focus:border-brand-600 focus:bg-white rounded-xl text-sm outline-none transition">
+                    </div>
+
+                    <!-- Comment / Portion Note -->
+                    <div>
+                        <label for="order-cust-comment" class="block text-xs font-semibold text-stone-700 mb-1">Қосымша пікір / мөлшері</label>
+                        <textarea id="order-cust-comment" rows="2" placeholder="Мысалы: пиязсыз, 2 адамға құралдар, ащы соус..." 
+                            class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 focus:border-brand-600 focus:bg-white rounded-xl text-sm outline-none transition resize-none"></textarea>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Drawer Footer Totals & Submit -->
+        <div id="cart-footer" class="hidden p-5 sm:p-6 bg-stone-50 border-t border-stone-200 space-y-3">
+            <div class="space-y-1 text-sm">
+                <div class="flex justify-between text-stone-500">
+                    <span>Тағамдар сомасы:</span>
+                    <span id="cart-subtotal-text">0 ₸</span>
+                </div>
+                <div id="cart-savings-row" class="flex justify-between text-emerald-600 font-semibold">
+                    <span>Жеңілдікпен үнем:</span>
+                    <span id="cart-savings-text">0 ₸</span>
+                </div>
+                <div class="flex justify-between text-base font-extrabold text-slateDark pt-2 border-t border-stone-200">
+                    <span>Жалпы сома:</span>
+                    <span id="cart-final-text" class="text-lg text-brand-600">0 ₸</span>
+                </div>
+            </div>
+            <button type="submit" form="checkout-form" 
+                class="w-full py-3.5 px-6 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-2xl shadow-md shadow-brand-600/20 flex items-center justify-center gap-2 transition active:scale-[0.98]">
+                <span>Тапсырыс беру</span>
+                <i data-lucide="arrow-right" class="w-5 h-5"></i>
+            </button>
+        </div>
+    </aside>
+
+    <!-- ========================================== -->
+    <!-- ORDER CONFIRMATION MODAL                   -->
+    <!-- ========================================== -->
+    <div id="order-confirm-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl animate-fade-up">
+            <div class="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-4">
+                <i data-lucide="check-circle-2" class="w-10 h-10"></i>
+            </div>
+            <h3 class="text-xl font-extrabold text-center text-slateDark mb-1">Тапсырыс қабылданды!</h3>
+            <p class="text-xs text-center text-stone-500 mb-4">
+                Тапсырыс нөмірі: <strong id="confirm-order-number" class="text-slateDark">#1001</strong> • Сіздің тапсырысыңыз жүйеге тіркелді.
+            </p>
+
+            <!-- Receipt Summary Box -->
+            <div id="confirm-order-summary" class="bg-stone-50 border border-stone-200 rounded-2xl p-4 text-xs space-y-2 mb-5 max-h-48 overflow-y-auto">
+                <!-- Dynamic summary injected here -->
+            </div>
+
+            <div class="space-y-2.5">
+                <a id="confirm-whatsapp-btn" href="https://wa.me/77001234567" target="_blank" rel="noopener noreferrer"
+                    class="w-full py-3.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-2xl text-sm flex items-center justify-center gap-2 shadow-md shadow-emerald-600/20 transition">
+                    <i data-lucide="message-circle" class="w-5 h-5"></i>
+                    <span>WhatsApp-қа жіберу</span>
+                </a>
+                <button type="button" data-action="close-confirm-modal"
+                    class="w-full py-3 px-4 bg-stone-100 hover:bg-stone-200 text-slateDark font-bold rounded-2xl text-sm transition">
+                    Жабу
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- ADMIN PIN MODAL                            -->
+    <!-- ========================================== -->
+    <div id="admin-login-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 sm:p-8 shadow-2xl animate-fade-up relative">
+            <button type="button" data-action="close-admin-login" class="absolute top-4 right-4 p-2 rounded-xl text-stone-400 hover:text-stone-700 hover:bg-stone-100">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+            
+            <div class="w-14 h-14 rounded-2xl bg-slateDark text-brand-500 flex items-center justify-center mx-auto mb-4 shadow-md">
+                <i data-lucide="key-round" class="w-7 h-7"></i>
+            </div>
+            
+            <h3 class="text-xl font-extrabold text-center text-slateDark mb-1">Админ панель</h3>
+            <p class="text-xs text-center text-stone-500 mb-6">Басқару бөліміне кіру үшін құпия кодты теріңіз</p>
+            
+            <form id="admin-login-form" class="space-y-4">
+                <div>
+                    <input type="password" id="admin-pin-input" maxlength="8" inputmode="numeric" required placeholder="••••" 
+                        class="w-full text-center text-2xl tracking-[0.5em] font-bold py-3 bg-stone-100 border-2 border-transparent focus:border-brand-600 focus:bg-white rounded-2xl outline-none transition">
+                    <p id="admin-pin-error" class="hidden text-xs text-red-600 text-center mt-2 font-semibold">Код қате! Қайта теріңіз.</p>
+                </div>
+                
+                <p class="text-xs text-center text-stone-400">
+                    Демо код: <span id="admin-demo-pin-hint" class="font-mono font-semibold text-stone-600">1234</span>
+                </p>
+
+                <button type="submit" class="w-full py-3 bg-slateDark hover:bg-slate-800 text-white font-bold rounded-2xl transition shadow-sm">
+                    Кіру
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 2. ADMIN DASHBOARD VIEW (АДМИН ПАНЕЛЬ)     -->
+    <!-- ========================================== -->
+    <div id="admin-view" class="hidden min-h-screen bg-stone-100 flex flex-col">
+        
+        <!-- Admin Header -->
+        <header class="bg-slateDark text-white sticky top-0 z-40 shadow-md">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-brand-600 flex items-center justify-center text-white">
+                        <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <span class="font-bold text-base sm:text-lg block leading-none">Админ Панель</span>
+                        <span id="admin-cafe-subtitle" class="text-[11px] text-slate-400">DÄM CAFÉ басқару жүйесі</span>
+                    </div>
+                </div>
+
+                <button type="button" data-action="exit-admin" class="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs sm:text-sm font-semibold transition">
+                    <i data-lucide="arrow-left" class="w-4 h-4 text-brand-500"></i>
+                    <span>Сайтқа оралу</span>
+                </button>
+            </div>
+
+            <!-- 4 Admin Tabs -->
+            <div class="bg-slate-900 border-t border-white/10">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex overflow-x-auto no-scrollbar">
+                    <button type="button" data-admin-tab="orders" class="admin-tab-btn px-4 sm:px-6 py-3.5 text-sm font-semibold border-b-2 border-brand-500 text-white flex items-center gap-2 whitespace-nowrap">
+                        <i data-lucide="bell-ring" class="w-4 h-4"></i>
+                        <span>Тапсырыстар</span>
+                        <span id="admin-new-orders-badge" class="bg-brand-600 text-white text-xs px-2 py-0.5 rounded-full">0</span>
+                    </button>
+                    <button type="button" data-admin-tab="menu" class="admin-tab-btn px-4 sm:px-6 py-3.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-white flex items-center gap-2 whitespace-nowrap">
+                        <i data-lucide="utensils" class="w-4 h-4"></i>
+                        <span>Мәзір / Тауарлар</span>
+                    </button>
+                    <button type="button" data-admin-tab="categories" class="admin-tab-btn px-4 sm:px-6 py-3.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-white flex items-center gap-2 whitespace-nowrap">
+                        <i data-lucide="folder-plus" class="w-4 h-4"></i>
+                        <span>Пункттер / Категориялар</span>
+                    </button>
+                    <button type="button" data-admin-tab="settings" class="admin-tab-btn px-4 sm:px-6 py-3.5 text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-white flex items-center gap-2 whitespace-nowrap">
+                        <i data-lucide="settings" class="w-4 h-4"></i>
+                        <span>Баптаулар</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Admin Main Container -->
+        <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+            
+            <!-- TAB 1: ORDERS -->
+            <section id="admin-tab-orders" class="space-y-6">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                        <h2 class="text-xl sm:text-2xl font-extrabold text-slateDark">Түскен тапсырыстар</h2>
+                        <p class="text-sm text-stone-500">Клиенттер жіберген барлық тапсырыстар тізімі</p>
+                    </div>
+                    <select id="admin-orders-filter" class="px-4 py-2.5 bg-white border border-stone-200 rounded-xl text-sm font-semibold text-slateDark outline-none">
+                        <option value="all">Барлық тапсырыстар</option>
+                        <option value="Жаңа">🔴 Жаңа</option>
+                        <option value="Дайындалуда">🟡 Дайындалуда</option>
+                        <option value="Жолда">🔵 Жолда</option>
+                        <option value="Орындалды">🟢 Орындалды</option>
+                        <option value="Бас тартылды">⚫ Бас тартылды</option>
+                    </select>
+                </div>
+
+                <div id="admin-orders-grid" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <!-- Dynamic Order Cards -->
+                </div>
+            </section>
+
+            <!-- TAB 2: MENU ITEMS -->
+            <section id="admin-tab-menu" class="hidden space-y-6">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                        <h2 class="text-xl sm:text-2xl font-extrabold text-slateDark">Мәзір және Тауарлар</h2>
+                        <p class="text-sm text-stone-500">Жаңа тағам қосу, баға мен жеңілдік орнату, сурет жүктеу</p>
+                    </div>
+                    <button type="button" data-action="open-add-product" class="px-5 py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl shadow-sm flex items-center justify-center gap-2 transition">
+                        <i data-lucide="plus-circle" class="w-5 h-5"></i>
+                        <span>+ Жаңа тағам қосу</span>
+                    </button>
+                </div>
+
+                <!-- Search & Category Filter in Admin -->
+                <div class="bg-white p-4 rounded-2xl border border-stone-200 flex flex-col sm:flex-row gap-3">
+                    <input type="text" id="admin-products-search" placeholder="Тағам атауымен іздеу..." 
+                        class="flex-1 px-4 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm outline-none focus:border-brand-600">
+                    <select id="admin-products-cat-filter" class="px-4 py-2 bg-stone-50 border border-stone-200 rounded-xl text-sm font-medium outline-none">
+                        <option value="all">Барлық категориялар</option>
+                    </select>
+                </div>
+
+                <!-- Products List -->
+                <div id="admin-products-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    <!-- Dynamic Admin Product Cards -->
+                </div>
+            </section>
+
+            <!-- TAB 3: CATEGORIES -->
+            <section id="admin-tab-categories" class="hidden space-y-6">
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-extrabold text-slateDark">Пункттер / Категориялар</h2>
+                    <p class="text-sm text-stone-500">Жаңа мәзір бөлімін қосыңыз (мысалы: Десерттер, Комбо, Таңғы ас)</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Add Category Card -->
+                    <div class="bg-white p-6 rounded-2xl border border-stone-200 h-fit">
+                        <h3 class="font-bold text-base text-slateDark mb-4">Жаңа пункт қосу</h3>
+                        <form id="admin-add-category-form" class="space-y-4">
+                            <div>
+                                <label for="new-category-name" class="block text-xs font-semibold text-stone-700 mb-1">Категория атауы *</label>
+                                <input type="text" id="new-category-name" required placeholder="Мысалы: Десерттер, Комбо..." 
+                                    class="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-200 focus:border-brand-600 rounded-xl text-sm outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-stone-700 mb-1.5">Эмодзи белгіше</label>
+                                <div id="emoji-selector" class="grid grid-cols-6 gap-2">
+                                    <button type="button" data-emoji="🍽️" class="emoji-choice p-2 text-lg rounded-xl border-2 border-brand-600 bg-brand-50">🍽️</button>
+                                    <button type="button" data-emoji="🍔" class="emoji-choice p-2 text-lg rounded-xl border border-stone-200 hover:bg-stone-50">🍔</button>
+                                    <button type="button" data-emoji="🍕" class="emoji-choice p-2 text-lg rounded-xl border border-stone-200 hover:bg-stone-50">🍕</button>
+                                    <button type="button" data-emoji="🥤" class="emoji-choice p-2 text-lg rounded-xl border border-stone-200 hover:bg-stone-50">🥤</button>
+                                    <button type="button" data-emoji="🍰" class="emoji-choice p-2 text-lg rounded-xl border border-stone-200 hover:bg-stone-50">🍰</button>
+                                    <button type="button" data-emoji="🥗" class="emoji-choice p-2 text-lg rounded-xl border border-stone-200 hover:bg-stone-50">🥗</button>
+                                    <button type="button" data-emoji="☕" class="emoji-choice p-2 text-lg rounded-xl border border-stone-200 hover:bg-stone-50">☕</button>
+                                    <button type="button" data-emoji="🍜" class="emoji-choice p-2 text-lg rounded-xl border border-stone-200 hover:bg-stone-50">🍜</button>
+                                    <button type="button" data-emoji="🥩" class="emoji-choice p-2 text-lg rounded-xl border border-stone-200 hover:bg-stone-50">🥩</button>
+                                    <button type="button" data-emoji="🍣" class="emoji-choice p-2 text-lg rounded-xl border border-stone-200 hover:bg-stone-50">🍣</button>
+                                    <button type="button" data-emoji="🥐" class="emoji-choice p-2 text-lg rounded-xl border border-stone-200 hover:bg-stone-50">🥐</button>
+                                    <button type="button" data-emoji="🎁" class="emoji-choice p-2 text-lg rounded-xl border border-stone-200 hover:bg-stone-50">🎁</button>
+                                </div>
+                                <input type="hidden" id="selected-category-emoji" value="🍽️">
+                            </div>
+                            <button type="submit" class="w-full py-2.5 bg-slateDark hover:bg-slate-800 text-white font-bold rounded-xl text-sm transition">
+                                + Қосу
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Existing Categories List -->
+                    <div class="lg:col-span-2 bg-white p-6 rounded-2xl border border-stone-200">
+                        <h3 class="font-bold text-base text-slateDark mb-4">Барлық категориялар</h3>
+                        <div id="admin-categories-list" class="space-y-3">
+                            <!-- Dynamic Categories -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 4: SETTINGS -->
+            <section id="admin-tab-settings" class="hidden max-w-2xl">
+                <div class="bg-white p-6 sm:p-8 rounded-2xl border border-stone-200">
+                    <h2 class="text-xl font-extrabold text-slateDark mb-1">Баптаулар</h2>
+                    <p class="text-sm text-stone-500 mb-6">Кафе атауын, WhatsApp нөмірін, жұмыс уақытын және админ кодын өзгерту</p>
+                    
+                    <form id="admin-settings-form" class="space-y-4">
+                        <div>
+                            <label for="setting-cafe-name" class="block text-xs font-semibold text-stone-700 mb-1">Кафе атауы *</label>
+                            <input type="text" id="setting-cafe-name" required class="w-full px-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm outline-none focus:border-brand-600">
+                        </div>
+                        <div>
+                            <label for="setting-cafe-tagline" class="block text-xs font-semibold text-stone-700 mb-1">Қысқаша сипаттама *</label>
+                            <input type="text" id="setting-cafe-tagline" required class="w-full px-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm outline-none focus:border-brand-600">
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label for="setting-whatsapp" class="block text-xs font-semibold text-stone-700 mb-1">WhatsApp нөмірі (мысалы: 77001234567) *</label>
+                                <input type="text" id="setting-whatsapp" required placeholder="77001234567" class="w-full px-4 py-2.5 bg-emerald-50/40 border border-emerald-200 rounded-xl text-sm font-mono outline-none focus:border-emerald-600">
+                            </div>
+                            <div>
+                                <label for="setting-hours" class="block text-xs font-semibold text-stone-700 mb-1">Жұмыс уақыты *</label>
+                                <input type="text" id="setting-hours" required placeholder="09:00 - 23:00" class="w-full px-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl text-sm outline-none focus:border-brand-600">
+                            </div>
+                        </div>
+                        <div>
+                            <label for="setting-admin-pin" class="block text-xs font-semibold text-stone-700 mb-1">Жаңа админ коды (PIN) *</label>
+                            <input type="text" id="setting-admin-pin" required minlength="4" maxlength="8" class="w-full px-4 py-2.5 bg-amber-50/50 border border-amber-200 rounded-xl text-sm font-mono font-bold outline-none focus:border-brand-600">
+                        </div>
+                        
+                        <div class="pt-4 flex flex-wrap items-center justify-between gap-3 border-t border-stone-100">
+                            <button type="submit" class="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl text-sm shadow-sm transition">
+                                Сақтау
+                            </button>
+                            <button type="button" data-action="reset-demo-data" class="px-4 py-2.5 text-xs font-semibold text-red-600 hover:bg-red-50 rounded-xl border border-red-200 transition">
+                                Демо деректерді қалпына келтіру
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- ADD / EDIT PRODUCT MODAL (ADMIN)           -->
+    <!-- ========================================== -->
+    <div id="product-form-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs overflow-y-auto">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl my-8 animate-fade-up">
+            <div class="flex items-center justify-between pb-4 border-b border-stone-100 mb-5">
+                <h3 id="product-modal-heading" class="text-lg font-extrabold text-slateDark">Жаңа тағам қосу</h3>
+                <button type="button" data-action="close-product-modal" class="p-2 rounded-xl text-stone-400 hover:text-stone-700 hover:bg-stone-100">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <form id="product-editor-form" class="space-y-4">
+                <input type="hidden" id="edit-prod-id">
+                
+                <!-- Image Upload + Live Preview -->
+                <div class="bg-stone-50 p-3.5 rounded-2xl border border-stone-200/80">
+                    <label class="block text-xs font-semibold text-stone-700 mb-2">Тағам суреті</label>
+                    <div class="flex items-center gap-4">
+                        <div class="w-24 h-24 rounded-2xl overflow-hidden border border-stone-200 bg-white shrink-0 relative">
+                            <img id="edit-prod-preview" src="" alt="Алдын ала көру" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex-1 space-y-2">
+                            <label class="flex items-center justify-center gap-2 w-full py-2.5 px-3 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold cursor-pointer transition shadow-xs">
+                                <i data-lucide="camera" class="w-4 h-4"></i>
+                                <span>Сурет жүктеу (Галерея / Файл)</span>
+                                <input type="file" id="edit-prod-file" accept="image/*" class="hidden">
+                            </label>
+                            <input type="text" id="edit-prod-url" placeholder="Немесе сурет сілтемесі (URL)..." 
+                                class="w-full px-3 py-1.5 bg-white border border-stone-200 rounded-xl text-xs outline-none focus:border-brand-600">
+                            <p id="edit-prod-img-status" class="text-[11px] text-stone-500">JPG, PNG, WEBP қолдау көрсетіледі</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Name & Category -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label for="edit-prod-name" class="block text-xs font-semibold text-stone-700 mb-1">Тағам атауы *</label>
+                        <input type="text" id="edit-prod-name" required placeholder="Мысалы: Пепперони пицца" 
+                            class="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-200 focus:border-brand-600 rounded-xl text-sm outline-none">
+                    </div>
+                    <div>
+                        <label for="edit-prod-category" class="block text-xs font-semibold text-stone-700 mb-1">Категория *</label>
+                        <select id="edit-prod-category" required class="w-full px-3.5 py-2.5 bg-stone-50 border border-stone-200 focus:border-brand-600 rounded-xl text-sm outline-none">
+                            <!-- Populated dynamically -->
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Price, Discount & Portion -->
+                <div class="grid grid-cols-3 gap-3 bg-brand-50/50 p-3.5 rounded-2xl border border-brand-200/70">
+                    <div>
+                        <label for="edit-prod-price" class="block text-xs font-semibold text-stone-700 mb-1">Бағасы, ₸ *</label>
+                        <input type="number" id="edit-prod-price" required min="50" step="10" placeholder="2500" 
+                            class="w-full px-3 py-2 bg-white border border-stone-200 focus:border-brand-600 rounded-xl text-sm font-bold outline-none">
+                    </div>
+                    <div>
+                        <label for="edit-prod-discount" class="block text-xs font-semibold text-stone-700 mb-1">Жеңілдік, %</label>
+                        <input type="number" id="edit-prod-discount" min="0" max="90" value="0" placeholder="0" 
+                            class="w-full px-3 py-2 bg-white border border-stone-200 focus:border-brand-600 rounded-xl text-sm font-bold text-brand-600 outline-none">
+                    </div>
+                    <div>
+                        <label for="edit-prod-portion" class="block text-xs font-semibold text-stone-700 mb-1">Мөлшері</label>
+                        <input type="text" id="edit-prod-portion" placeholder="350 г" 
+                            class="w-full px-3 py-2 bg-white border border-stone-200 focus:border-brand-600 rounded-xl text-sm outline-none">
+                    </div>
+                    <div class="col-span-3 flex items-center justify-between text-xs pt-2 border-t border-brand-200/60">
+                        <span class="text-stone-600">Соңғы бағасы:</span>
+                        <span id="edit-prod-final-preview" class="font-extrabold text-sm text-emerald-700">0 ₸</span>
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <div>
+                    <label for="edit-prod-desc" class="block text-xs font-semibold text-stone-700 mb-1">Сипаттамасы *</label>
+                    <textarea id="edit-prod-desc" required rows="2" placeholder="Құрамы, дәмі туралы қысқаша ақпарат..." 
+                        class="w-full px-3.5 py-2 bg-stone-50 border border-stone-200 focus:border-brand-600 rounded-xl text-sm outline-none resize-none"></textarea>
+                </div>
+
+                <div class="pt-3 flex items-center justify-end gap-3 border-t border-stone-100">
+                    <button type="button" data-action="close-product-modal" class="px-4 py-2.5 rounded-xl text-sm font-semibold text-stone-600 hover:bg-stone-100 transition">
+                        Бас тарту
+                    </button>
+                    <button type="submit" class="px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl text-sm shadow-sm transition">
+                        Сақтау
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- APPLICATION SCRIPT (MODULAR & BUG-FREE)    -->
+    <!-- ========================================== -->
+    <script>
+        (function() {
+            'use strict';
+
+            // Inline SVG Fallback Placeholder (No broken external images ever)
+            const FALLBACK_FOOD_SVG = "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(
+                '<svg xmlns="http://www.w3.org/2000/svg" width="600" height="450" viewBox="0 0 600 450">' +
+                '<rect width="600" height="450" fill="#F5F5F4"/>' +
+                '<circle cx="300" cy="200" r="64" fill="#E7E5E4"/>' +
+                '<text x="300" y="218" font-size="48" text-anchor="middle" fill="#78716C">🍽️</text>' +
+                '<text x="300" y="305" font-family="sans-serif" font-size="20" font-weight="bold" text-anchor="middle" fill="#78716C">DÄM CAFÉ</text>' +
+                '</svg>'
+            );
+
+            // Storage Keys (v2 to avoid any corrupted legacy keys)
+            const STORAGE = {
+                SETTINGS: 'dam_cafe_settings_v2',
+                CATEGORIES: 'dam_cafe_categories_v2',
+                PRODUCTS: 'dam_cafe_products_v2',
+                ORDERS: 'dam_cafe_orders_v2',
+                CART: 'dam_cafe_cart_v2'
+            };
+
+            // Default Demo Data
+            const DEFAULT_SETTINGS = {
+                name: 'DÄM CAFÉ',
+                tagline: 'Дәмді тағамдар • Жылдам жеткізу',
+                whatsapp: '77001234567',
+                hours: '09:00 - 23:00',
+                adminPin: '1234'
+            };
+
+            const DEFAULT_CATEGORIES = [
+                { id: 'cat_burgers', name: 'Бургерлер', emoji: '🍔' },
+                { id: 'cat_pizza', name: 'Пицца', emoji: '🍕' },
+                { id: 'cat_drinks', name: 'Сусындар', emoji: '🥤' },
+                { id: 'cat_desserts', name: 'Десерттер', emoji: '🍰' }
+            ];
+
+            const DEFAULT_PRODUCTS = [
+                {
+                    id: 'prod_101',
+                    name: 'Фирмалық Сиыр Еті Бургері',
+                    categoryId: 'cat_burgers',
+                    price: 2600,
+                    discount: 20,
+                    portion: '350 г',
+                    description: 'Шырынды мәрмәр сиыр еті, чеддер ірімшігі, қытырлақ салат жапырағы және фирмалық тұздық.',
+                    image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=600&q=80'
+                },
+                {
+                    id: 'prod_102',
+                    name: 'Чизбургер Двойной',
+                    categoryId: 'cat_burgers',
+                    price: 2900,
+                    discount: 0,
+                    portion: '410 г',
+                    description: 'Екі қабат сиыр еті, балқытылған чеддер, маринадталған қияр және барбекю соусы.',
+                    image: 'https://images.unsplash.com/photo-1553979459-d2229ba7433b?auto=format&fit=crop&w=600&q=80'
+                },
+                {
+                    id: 'prod_103',
+                    name: 'Пепперони Пицца',
+                    categoryId: 'cat_pizza',
+                    price: 3800,
+                    discount: 15,
+                    portion: '33 см • 620 г',
+                    description: 'Ысталған пепперони шұжығы, моцарелла ірімшігі және хош иісті томат соусы.',
+                    image: 'https://images.unsplash.com/photo-1628840042765-356cda07504e?auto=format&fit=crop&w=600&q=80'
+                },
+                {
+                    id: 'prod_104',
+                    name: 'Төрт Ірімшік Пиццасы',
+                    categoryId: 'cat_pizza',
+                    price: 3600,
+                    discount: 0,
+                    portion: '33 см • 580 г',
+                    description: 'Моцарелла, пармезан, дорблю және чеддер ірімшіктерінің үйлесімі.',
+                    image: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=600&q=80'
+                },
+                {
+                    id: 'prod_105',
+                    name: 'Жидектер Лимонады',
+                    categoryId: 'cat_drinks',
+                    price: 1400,
+                    discount: 0,
+                    portion: '0.5 л',
+                    description: 'Табиғи таңқурай, құлпынай, жалбыз жапырағы және сергіткіш газдалған су.',
+                    image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=600&q=80'
+                },
+                {
+                    id: 'prod_106',
+                    name: 'Айс Латте Карамель',
+                    categoryId: 'cat_drinks',
+                    price: 1500,
+                    discount: 20,
+                    portion: '0.4 л',
+                    description: '100% Арабика эспрессосы, салқын сүт, мұз және тұзды карамель шәрбаты.',
+                    image: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?auto=format&fit=crop&w=600&q=80'
+                },
+                {
+                    id: 'prod_107',
+                    name: 'Сан-Себастьян Чизкейкі',
+                    categoryId: 'cat_desserts',
+                    price: 2100,
+                    discount: 0,
+                    portion: '180 г',
+                    description: 'Крем-ірімшіктен жасалған нәзік десерт, ыстық бельгиялық шоколадпен ұсынылады.',
+                    image: 'https://images.unsplash.com/photo-1533134242443-d4fd215305ad?auto=format&fit=crop&w=600&q=80'
+                },
+                {
+                    id: 'prod_108',
+                    name: 'Шоколадты Брауни',
+                    categoryId: 'cat_desserts',
+                    price: 1900,
+                    discount: 10,
+                    portion: '200 г',
+                    description: 'Ыстық шоколадты бәліш, ванильді балмұздақ және грек жаңғағы.',
+                    image: 'https://images.unsplash.com/photo-1564355808539-22fda35bed7e?auto=format&fit=crop&w=600&q=80'
+                }
+            ];
+
+            const DEFAULT_ORDERS = [
+                {
+                    id: 1001,
+                    customerName: 'Айдос Нұрланұлы',
+                    phone: '+7 (701) 555-44-33',
+                    deliveryType: 'Жеткізу',
+                    address: 'Абай даңғылы 45, 12-пәтер',
+                    comment: 'Пияз қоспауыңызды сұраймын',
+                    items: [
+                        { name: 'Фирмалық Сиыр Еті Бургері', qty: 2, finalPrice: 2080 },
+                        { name: 'Жидектер Лимонады', qty: 1, finalPrice: 1400 }
+                    ],
+                    total: 5560,
+                    status: 'Жаңа',
+                    createdAt: 'Бүгін, 19:15'
+                }
+            ];
+
+            // App State
+            const state = {
+                settings: Object.assign({}, DEFAULT_SETTINGS),
+                categories: [],
+                products: [],
+                orders: [],
+                cart: [],
+                selectedCategory: 'all',
+                searchQuery: '',
+                isAdminAuthenticated: false,
+                activeAdminTab: 'orders'
+            };
+
+            // Safe Storage Helpers
+            function safeReadStorage(key, fallback) {
+                try {
+                    const raw = localStorage.getItem(key);
+                    if (!raw) return fallback;
+                    const parsed = JSON.parse(raw);
+                    return parsed !== null && parsed !== undefined ? parsed : fallback;
+                } catch (err) {
+                    console.warn('Storage read fallback for:', key, err);
+                    return fallback;
+                }
+            }
+
+            function safeWriteStorage(key, value) {
+                try {
+                    localStorage.setItem(key, JSON.stringify(value));
+                    return true;
+                } catch (err) {
+                    console.error('Storage write error:', err);
+                    showToast('Жад толып қалды! Ескі тапсырыстарды тазалаңыз.', 'error');
+                    return false;
+                }
+            }
+
+            // Initialize State
+            function initState() {
+                state.settings = Object.assign({}, DEFAULT_SETTINGS, safeReadStorage(STORAGE.SETTINGS, {}));
+                state.categories = safeReadStorage(STORAGE.CATEGORIES, null);
+                if (!Array.isArray(state.categories) || state.categories.length === 0) {
+                    state.categories = DEFAULT_CATEGORIES.slice();
+                    safeWriteStorage(STORAGE.CATEGORIES, state.categories);
+                }
+
+                state.products = safeReadStorage(STORAGE.PRODUCTS, null);
+                if (!Array.isArray(state.products)) {
+                    state.products = DEFAULT_PRODUCTS.slice();
+                    safeWriteStorage(STORAGE.PRODUCTS, state.products);
+                }
+
+                state.orders = safeReadStorage(STORAGE.ORDERS, null);
+                if (!Array.isArray(state.orders)) {
+                    state.orders = DEFAULT_ORDERS.slice();
+                    safeWriteStorage(STORAGE.ORDERS, state.orders);
+                }
+
+                state.cart = safeReadStorage(STORAGE.CART, []);
+                if (!Array.isArray(state.cart)) {
+                    state.cart = [];
+                }
+            }
+
+            // Formatting Helpers
+            function escapeHtml(value) {
+                if (value === null || value === undefined) return '';
+                return String(value)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+            }
+
+            function formatPrice(num) {
+                const n = Math.round(Number(num) || 0);
+                return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' ₸';
+            }
+
+            function getFinalPrice(price, discount) {
+                const p = Number(price) || 0;
+                const d = Number(discount) || 0;
+                if (d <= 0) return p;
+                return Math.round(p * (1 - d / 100));
+            }
+
+            function cleanWhatsAppDigits(raw) {
+                const digits = String(raw || '').replace(/\D/g, '');
+                if (digits.startsWith('8') && digits.length === 11) {
+                    return '7' + digits.slice(1);
+                }
+                return digits || '77001234567';
+            }
+
+            function formatDisplayPhone(digits) {
+                const d = cleanWhatsAppDigits(digits);
+                if (d.length === 11 && d.startsWith('7')) {
+                    return `+7 (${d.slice(1, 4)}) ${d.slice(4, 7)}-${d.slice(7, 9)}-${d.slice(9, 11)}`;
+                }
+                return '+' + d;
+            }
+
+            // Toast Notification
+            function showToast(message, type) {
+                const container = document.getElementById('toast-container');
+                if (!container) return;
+
+                const toast = document.createElement('div');
+                const borderClass = type === 'error' ? 'border-red-500 bg-red-950' : (type === 'info' ? 'border-slate-500 bg-slate-900' : 'border-emerald-500 bg-slateDark');
+                toast.className = `${borderClass} text-white border-l-4 px-4 py-3 rounded-xl shadow-xl text-sm font-medium animate-fade-up pointer-events-auto`;
+                toast.textContent = message;
+
+                container.appendChild(toast);
+                setTimeout(function() {
+                    toast.style.opacity = '0';
+                    toast.style.transition = 'opacity 0.2s ease';
+                    setTimeout(function() {
+                        if (toast.parentNode) toast.parentNode.removeChild(toast);
+                    }, 220);
+                }, 2600);
+            }
+
+            // Sync Settings to UI
+            function renderSettingsToUI() {
+                const name = state.settings.name || 'DÄM CAFÉ';
+                const tagline = state.settings.tagline || 'Дәмді тағамдар • Жылдам жеткізу';
+                const hours = state.settings.hours || '09:00 - 23:00';
+                const waDigits = cleanWhatsAppDigits(state.settings.whatsapp);
+                const displayPhone = formatDisplayPhone(waDigits);
+
+                document.title = `${name} — Заманауи мәзір және жеткізу`;
+                document.getElementById('header-cafe-name').textContent = name;
+                document.getElementById('header-cafe-tagline').textContent = tagline;
+                document.getElementById('header-hours-text').textContent = `Ашық • ${hours}`;
+                document.getElementById('hero-hours-badge').textContent = `Ашық • ${hours}`;
+                document.getElementById('hero-phone-text').textContent = displayPhone;
+                document.getElementById('footer-cafe-name').textContent = name;
+                document.getElementById('admin-cafe-subtitle').textContent = `${name} басқару жүйесі`;
+                document.getElementById('admin-demo-pin-hint').textContent = state.settings.adminPin || '1234';
+
+                const defaultMsg = encodeURIComponent(`Сәлеметсіз бе, ${name}! Тапсырыс бойынша жазып тұрмын.`);
+                const waUrl = `https://wa.me/${waDigits}?text=${defaultMsg}`;
+                document.getElementById('header-whatsapp-link').href = waUrl;
+                document.getElementById('hero-whatsapp-btn').href = waUrl;
+                document.getElementById('floating-whatsapp-btn').href = waUrl;
+            }
+
+            // Render Category Filter Pills (Customer View)
+            function renderCategoryPills() {
+                const container = document.getElementById('category-filter-bar');
+                if (!container) return;
+
+                let html = `
+                    <button type="button" data-action="select-category" data-id="all"
+                        class="px-4 py-2 rounded-2xl text-sm font-semibold transition shrink-0 flex items-center gap-1.5 ${
+                            state.selectedCategory === 'all'
+                                ? 'bg-brand-600 text-white shadow-sm'
+                                : 'bg-white text-stone-700 hover:bg-stone-100 border border-stone-200'
+                        }">
+                        <span>🔥</span>
+                        <span>Барлығы</span>
+                    </button>
+                `;
+
+                state.categories.forEach(function(cat) {
+                    const active = state.selectedCategory === cat.id;
+                    html += `
+                        <button type="button" data-action="select-category" data-id="${escapeHtml(cat.id)}"
+                            class="px-4 py-2 rounded-2xl text-sm font-semibold transition shrink-0 flex items-center gap-1.5 ${
+                                active
+                                    ? 'bg-brand-600 text-white shadow-sm'
+                                    : 'bg-white text-stone-700 hover:bg-stone-100 border border-stone-200'
+                            }">
+                            <span>${escapeHtml(cat.emoji || '🍽️')}</span>
+                            <span>${escapeHtml(cat.name)}</span>
+                        </button>
+                    `;
+                });
+
+                container.innerHTML = html;
+            }
+
+            // Render Customer Menu Grid
+            function renderMenuGrid() {
+                const grid = document.getElementById('menu-grid');
+                const emptyState = document.getElementById('menu-empty-state');
+                const titleEl = document.getElementById('menu-section-title');
+                const countEl = document.getElementById('menu-items-count');
+
+                if (state.selectedCategory === 'all') {
+                    titleEl.textContent = 'Барлық мәзір';
+                } else {
+                    const cat = state.categories.find(c => c.id === state.selectedCategory);
+                    titleEl.textContent = cat ? `${cat.emoji} ${cat.name}` : 'Мәзір';
+                }
+
+                const filtered = state.products.filter(function(item) {
+                    const matchCat = state.selectedCategory === 'all' || item.categoryId === state.selectedCategory;
+                    const q = state.searchQuery;
+                    const matchSearch = !q ||
+                        item.name.toLowerCase().includes(q) ||
+                        (item.description && item.description.toLowerCase().includes(q));
+                    return matchCat && matchSearch;
+                });
+
+                countEl.textContent = `${filtered.length} тағам`;
+
+                if (filtered.length === 0) {
+                    grid.innerHTML = '';
+                    emptyState.classList.remove('hidden');
+                    lucide.createIcons();
+                    return;
+                }
+
+                emptyState.classList.add('hidden');
+
+                grid.innerHTML = filtered.map(function(prod) {
+                    const hasDiscount = Number(prod.discount) > 0;
+                    const finalPrice = getFinalPrice(prod.price, prod.discount);
+                    const cartEntry = state.cart.find(c => c.productId === prod.id);
+                    const qty = cartEntry ? cartEntry.qty : 0;
+                    const cat = state.categories.find(c => c.id === prod.categoryId);
+                    const imgSrc = prod.image || FALLBACK_FOOD_SVG;
+
+                    return `
+                        <article class="bg-white rounded-3xl border border-stone-200/80 shadow-xs hover:shadow-lg transition-all duration-200 overflow-hidden flex flex-col">
+                            <div class="relative aspect-[4/3] bg-stone-100 overflow-hidden">
+                                <img src="${escapeHtml(imgSrc)}" alt="${escapeHtml(prod.name)}"
+                                    class="menu-food-img w-full h-full object-cover transition-transform duration-300 hover:scale-105">
+                                
+                                ${hasDiscount ? `
+                                    <span class="absolute top-3 left-3 bg-red-600 text-white text-xs font-extrabold px-2.5 py-1 rounded-xl shadow">
+                                        -${Number(prod.discount)}%
+                                    </span>
+                                ` : ''}
+
+                                ${cat ? `
+                                    <span class="absolute bottom-3 left-3 bg-slateDark/75 backdrop-blur-xs text-white text-[11px] font-medium px-2.5 py-1 rounded-lg">
+                                        ${escapeHtml(cat.emoji)} ${escapeHtml(cat.name)}
+                                    </span>
+                                ` : ''}
+                            </div>
+
+                            <div class="p-5 flex-1 flex flex-col justify-between">
+                                <div>
+                                    <div class="flex items-start justify-between gap-2 mb-1.5">
+                                        <h4 class="text-base font-bold text-slateDark leading-snug">${escapeHtml(prod.name)}</h4>
+                                        ${prod.portion ? `<span class="text-[11px] font-semibold text-stone-500 bg-stone-100 px-2 py-0.5 rounded-md shrink-0">${escapeHtml(prod.portion)}</span>` : ''}
+                                    </div>
+                                    <p class="text-xs text-stone-500 line-clamp-2 mb-4 leading-relaxed">${escapeHtml(prod.description)}</p>
+                                </div>
+
+                                <div class="pt-3 border-t border-stone-100 flex items-center justify-between gap-2">
+                                    <div>
+                                        ${hasDiscount ? `
+                                            <span class="block text-xs text-stone-400 line-through font-medium">${formatPrice(prod.price)}</span>
+                                            <span class="text-lg font-extrabold text-brand-600">${formatPrice(finalPrice)}</span>
+                                        ` : `
+                                            <span class="text-lg font-extrabold text-slateDark">${formatPrice(prod.price)}</span>
+                                        `}
+                                    </div>
+
+                                    ${qty === 0 ? `
+                                        <button type="button" data-action="add-to-cart" data-id="${escapeHtml(prod.id)}"
+                                            class="px-4 py-2.5 bg-brand-50 hover:bg-brand-600 text-brand-700 hover:text-white font-bold text-xs sm:text-sm rounded-2xl transition flex items-center gap-1 active:scale-95">
+                                            <span>+ Себетке</span>
+                                        </button>
+                                    ` : `
+                                        <div class="flex items-center gap-2 bg-slateDark text-white rounded-2xl p-1">
+                                            <button type="button" data-action="dec-cart" data-id="${escapeHtml(prod.id)}"
+                                                class="w-7 h-7 rounded-xl hover:bg-white/15 flex items-center justify-center font-bold transition">−</button>
+                                            <span class="text-sm font-bold min-w-[20px] text-center">${qty}</span>
+                                            <button type="button" data-action="inc-cart" data-id="${escapeHtml(prod.id)}"
+                                                class="w-7 h-7 rounded-xl hover:bg-white/15 flex items-center justify-center font-bold transition">+</button>
+                                        </div>
+                                    `}
+                                </div>
+                            </div>
+                        </article>
+                    `;
+                }).join('');
+
+                // Attach safe image error handlers
+                grid.querySelectorAll('.menu-food-img').forEach(function(img) {
+                    img.addEventListener('error', function() {
+                        if (this.src !== FALLBACK_FOOD_SVG) {
+                            this.src = FALLBACK_FOOD_SVG;
+                        }
+                    });
+                });
+
+                lucide.createIcons();
+            }
+
+            // Cart Management
+            function addToCart(productId) {
+                const existing = state.cart.find(c => c.productId === productId);
+                if (existing) {
+                    existing.qty += 1;
+                } else {
+                    state.cart.push({ productId: productId, qty: 1 });
+                }
+                safeWriteStorage(STORAGE.CART, state.cart);
+                renderMenuGrid();
+                renderCartUI();
+
+                const prod = state.products.find(p => p.id === productId);
+                if (prod) {
+                    showToast(`«${prod.name}» себетке қосылды`, 'success');
+                }
+            }
+
+            function changeCartQty(productId, delta) {
+                const idx = state.cart.findIndex(c => c.productId === productId);
+                if (idx === -1) return;
+
+                state.cart[idx].qty += delta;
+                if (state.cart[idx].qty <= 0) {
+                    state.cart.splice(idx, 1);
+                }
+                safeWriteStorage(STORAGE.CART, state.cart);
+                renderMenuGrid();
+                renderCartUI();
+            }
+
+            function removeCartItem(productId) {
+                state.cart = state.cart.filter(c => c.productId !== productId);
+                safeWriteStorage(STORAGE.CART, state.cart);
+                renderMenuGrid();
+                renderCartUI();
+            }
+
+            function renderCartUI() {
+                // Remove deleted products from cart
+                state.cart = state.cart.filter(c => state.products.some(p => p.id === c.productId));
+
+                let totalCount = 0;
+                let subtotal = 0;
+                let finalTotal = 0;
+
+                const itemsHtml = state.cart.map(function(entry) {
+                    const prod = state.products.find(p => p.id === entry.productId);
+                    if (!prod) return '';
+
+                    const unitFinal = getFinalPrice(prod.price, prod.discount);
+                    totalCount += entry.qty;
+                    subtotal += prod.price * entry.qty;
+                    finalTotal += unitFinal * entry.qty;
+
+                    return `
+                        <div class="flex items-center gap-3 bg-stone-50 p-3 rounded-2xl border border-stone-200/70">
+                            <img src="${escapeHtml(prod.image || FALLBACK_FOOD_SVG)}" alt="${escapeHtml(prod.name)}"
+                                class="cart-thumb-img w-16 h-16 rounded-xl object-cover shrink-0 bg-white">
+                            <div class="flex-1 min-w-0">
+                                <h5 class="text-sm font-bold text-slateDark truncate">${escapeHtml(prod.name)}</h5>
+                                <p class="text-xs font-semibold text-brand-600 mt-0.5">${formatPrice(unitFinal)} × ${entry.qty} = ${formatPrice(unitFinal * entry.qty)}</p>
+                                <div class="flex items-center gap-2 mt-2">
+                                    <button type="button" data-action="dec-cart" data-id="${escapeHtml(prod.id)}" class="w-7 h-7 rounded-lg bg-white border border-stone-200 font-bold text-sm hover:bg-stone-100">−</button>
+                                    <span class="text-xs font-bold w-5 text-center">${entry.qty}</span>
+                                    <button type="button" data-action="inc-cart" data-id="${escapeHtml(prod.id)}" class="w-7 h-7 rounded-lg bg-white border border-stone-200 font-bold text-sm hover:bg-stone-100">+</button>
+                                </div>
+                            </div>
+                            <button type="button" data-action="remove-cart" data-id="${escapeHtml(prod.id)}" class="p-2 text-stone-400 hover:text-red-600 transition" title="Өшіру">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    `;
+                }).join('');
+
+                // Header & Mobile Floating Cart Badges
+                const headerBadge = document.getElementById('header-cart-badge');
+                const headerTotal = document.getElementById('header-cart-total');
+                const mobileBar = document.getElementById('mobile-cart-bar');
+
+                if (totalCount > 0) {
+                    headerBadge.textContent = totalCount;
+                    headerBadge.classList.remove('hidden');
+                    headerTotal.textContent = formatPrice(finalTotal);
+
+                    mobileBar.classList.remove('hidden');
+                    document.getElementById('mobile-cart-count').textContent = `${totalCount} тағам`;
+                    document.getElementById('mobile-cart-total').textContent = formatPrice(finalTotal);
+                } else {
+                    headerBadge.classList.add('hidden');
+                    headerTotal.textContent = '0 ₸';
+                    mobileBar.classList.add('hidden');
+                }
+
+                // Drawer Body & Footer
+                const listEl = document.getElementById('cart-items-list');
+                const emptyEl = document.getElementById('cart-empty-state');
+                const checkoutEl = document.getElementById('checkout-section');
+                const footerEl = document.getElementById('cart-footer');
+
+                if (totalCount === 0) {
+                    listEl.innerHTML = '';
+                    emptyEl.classList.remove('hidden');
+                    checkoutEl.classList.add('hidden');
+                    footerEl.classList.add('hidden');
+                } else {
+                    listEl.innerHTML = itemsHtml;
+                    emptyEl.classList.add('hidden');
+                    checkoutEl.classList.remove('hidden');
+                    footerEl.classList.remove('hidden');
+
+                    const savings = subtotal - finalTotal;
+                    document.getElementById('cart-subtotal-text').textContent = formatPrice(subtotal);
+                    document.getElementById('cart-final-text').textContent = formatPrice(finalTotal);
+
+                    const savingsRow = document.getElementById('cart-savings-row');
+                    if (savings > 0) {
+                        savingsRow.classList.remove('hidden');
+                        document.getElementById('cart-savings-text').textContent = `-${formatPrice(savings)}`;
+                    } else {
+                        savingsRow.classList.add('hidden');
+                    }
+
+                    listEl.querySelectorAll('.cart-thumb-img').forEach(function(img) {
+                        img.addEventListener('error', function() {
+                            if (this.src !== FALLBACK_FOOD_SVG) this.src = FALLBACK_FOOD_SVG;
+                        });
+                    });
+                }
+
+                lucide.createIcons();
+            }
+
+            function toggleCartDrawer(show) {
+                const backdrop = document.getElementById('cart-backdrop');
+                const drawer = document.getElementById('cart-drawer');
+                if (show) {
+                    backdrop.classList.remove('hidden');
+                    requestAnimationFrame(function() {
+                        drawer.classList.remove('translate-x-full');
+                    });
+                } else {
+                    drawer.classList.add('translate-x-full');
+                    setTimeout(function() {
+                        backdrop.classList.add('hidden');
+                    }, 300);
+                }
+            }
+
+            // Order Submission & WhatsApp Receipt Builder
+            function handleCheckoutSubmit(event) {
+                event.preventDefault();
+                if (state.cart.length === 0) return;
+
+                const deliveryRadio = document.querySelector('input[name="deliveryType"]:checked');
+                const deliveryType = deliveryRadio ? deliveryRadio.value : 'Жеткізу';
+                const customerName = document.getElementById('order-cust-name').value.trim();
+                const phone = document.getElementById('order-cust-phone').value.trim();
+                const address = deliveryType === 'Жеткізу'
+                    ? document.getElementById('order-cust-address').value.trim()
+                    : 'Өзім алып кетемін (Кафеден)';
+                const comment = document.getElementById('order-cust-comment').value.trim();
+
+                let total = 0;
+                const orderItems = state.cart.map(function(entry) {
+                    const prod = state.products.find(p => p.id === entry.productId);
+                    const finalPrice = getFinalPrice(prod.price, prod.discount);
+                    total += finalPrice * entry.qty;
+                    return {
+                        name: prod.name,
+                        qty: entry.qty,
+                        finalPrice: finalPrice
+                    };
+                });
+
+                const now = new Date();
+                const timeFormatted = `Бүгін, ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+                const nextId = state.orders.length > 0 ? Math.max.apply(null, state.orders.map(o => o.id)) + 1 : 1001;
+
+                const newOrder = {
+                    id: nextId,
+                    customerName: customerName,
+                    phone: phone,
+                    deliveryType: deliveryType,
+                    address: address,
+                    comment: comment,
+                    items: orderItems,
+                    total: total,
+                    status: 'Жаңа',
+                    createdAt: timeFormatted
+                };
+
+                state.orders.unshift(newOrder);
+                safeWriteStorage(STORAGE.ORDERS, state.orders);
+
+                // Clear cart & reset form
+                state.cart = [];
+                safeWriteStorage(STORAGE.CART, state.cart);
+                document.getElementById('checkout-form').reset();
+                document.getElementById('order-address-group').classList.remove('hidden');
+                document.getElementById('order-cust-address').required = true;
+
+                renderMenuGrid();
+                renderCartUI();
+                updateNewOrdersBadges();
+                toggleCartDrawer(false);
+                showToast('Тапсырысыңыз сәтті қабылданды!', 'success');
+
+                // Show Confirmation Modal with WhatsApp Link
+                openOrderConfirmationModal(newOrder);
+            }
+
+            function openOrderConfirmationModal(order) {
+                document.getElementById('confirm-order-number').textContent = `#${order.id}`;
+
+                const summaryEl = document.getElementById('confirm-order-summary');
+                const itemsHtml = order.items.map(function(it) {
+                    return `<div class="flex justify-between"><span>${escapeHtml(it.name)} × ${it.qty}</span><span class="font-bold">${formatPrice(it.finalPrice * it.qty)}</span></div>`;
+                }).join('');
+
+                summaryEl.innerHTML = `
+                    <div class="pb-2 border-b border-stone-200 space-y-1">
+                        <p><strong>Клиент:</strong> ${escapeHtml(order.customerName)} (${escapeHtml(order.phone)})</p>
+                        <p><strong>Алу тәсілі:</strong> ${escapeHtml(order.deliveryType)}</p>
+                        <p><strong>Мекенжай:</strong> ${escapeHtml(order.address)}</p>
+                        ${order.comment ? `<p><strong>Пікір:</strong> ${escapeHtml(order.comment)}</p>` : ''}
+                    </div>
+                    <div class="py-1 space-y-1">${itemsHtml}</div>
+                    <div class="pt-2 border-t border-stone-200 flex justify-between text-sm font-extrabold text-brand-600">
+                        <span>Жалпы сома:</span>
+                        <span>${formatPrice(order.total)}</span>
+                    </div>
+                `;
+
+                // Build WhatsApp message text
+                const waDigits = cleanWhatsAppDigits(state.settings.whatsapp);
+                const receiptLines = order.items.map(function(it, idx) {
+                    return `${idx + 1}. ${it.name} × ${it.qty} = ${formatPrice(it.finalPrice * it.qty)}`;
+                });
+
+                const waText = [
+                    `🍽️ *ЖАҢА ТАПСЫРЫС #${order.id}* (${state.settings.name})`,
+                    ``,
+                    `👤 *Аты-жөні:* ${order.customerName}`,
+                    `📞 *Телефон:* ${order.phone}`,
+                    `🚚 *Түрі:* ${order.deliveryType}`,
+                    `📍 *Мекенжай:* ${order.address}`,
+                    order.comment ? `💬 *Пікір:* ${order.comment}` : '',
+                    ``,
+                    `📋 *Тағамдар:*`,
+                    receiptLines.join('\n'),
+                    ``,
+                    `💰 *ЖАЛПЫ СОМА: ${formatPrice(order.total)}*`
+                ].filter(Boolean).join('\n');
+
+                document.getElementById('confirm-whatsapp-btn').href = `https://wa.me/${waDigits}?text=${encodeURIComponent(waText)}`;
+                document.getElementById('order-confirm-modal').classList.remove('hidden');
+                lucide.createIcons();
+            }
+
+            // Admin Authentication & Navigation
+            function updateNewOrdersBadges() {
+                const count = state.orders.filter(o => o.status === 'Жаңа').length;
+                const clientBadge = document.getElementById('client-new-orders-badge');
+                const adminBadge = document.getElementById('admin-new-orders-badge');
+
+                if (adminBadge) adminBadge.textContent = count;
+                if (clientBadge) {
+                    if (count > 0) {
+                        clientBadge.textContent = count;
+                        clientBadge.classList.remove('hidden');
+                    } else {
+                        clientBadge.classList.add('hidden');
+                    }
+                }
+            }
+
+            function openAdminLogin() {
+                if (state.isAdminAuthenticated) {
+                    enterAdminView();
+                    return;
+                }
+                document.getElementById('admin-pin-input').value = '';
+                document.getElementById('admin-pin-error').classList.add('hidden');
+                document.getElementById('admin-login-modal').classList.remove('hidden');
+                setTimeout(function() {
+                    document.getElementById('admin-pin-input').focus();
+                }, 80);
+            }
+
+            function handleAdminPinSubmit(event) {
+                event.preventDefault();
+                const pin = document.getElementById('admin-pin-input').value.trim();
+                if (pin === String(state.settings.adminPin)) {
+                    state.isAdminAuthenticated = true;
+                    document.getElementById('admin-login-modal').classList.add('hidden');
+                    enterAdminView();
+                    showToast('Админ панельге қош келдіңіз!', 'success');
+                } else {
+                    document.getElementById('admin-pin-error').classList.remove('hidden');
+                    document.getElementById('admin-pin-input').value = '';
+                }
+            }
+
+            function enterAdminView() {
+                document.getElementById('client-view').classList.add('hidden');
+                document.getElementById('admin-view').classList.remove('hidden');
+                window.scrollTo(0, 0);
+                switchAdminTab(state.activeAdminTab || 'orders');
+            }
+
+            function exitAdminView() {
+                document.getElementById('admin-view').classList.add('hidden');
+                document.getElementById('client-view').classList.remove('hidden');
+                renderSettingsToUI();
+                renderCategoryPills();
+                renderMenuGrid();
+                renderCartUI();
+                updateNewOrdersBadges();
+                window.scrollTo(0, 0);
+            }
+
+            function switchAdminTab(tabName) {
+                state.activeAdminTab = tabName;
+
+                document.querySelectorAll('.admin-tab-btn').forEach(function(btn) {
+                    const isMatch = btn.getAttribute('data-admin-tab') === tabName;
+                    if (isMatch) {
+                        btn.classList.remove('border-transparent', 'text-slate-400');
+                        btn.classList.add('border-brand-500', 'text-white');
+                    } else {
+                        btn.classList.remove('border-brand-500', 'text-white');
+                        btn.classList.add('border-transparent', 'text-slate-400');
+                    }
+                });
+
+                ['orders', 'menu', 'categories', 'settings'].forEach(function(key) {
+                    const sec = document.getElementById(`admin-tab-${key}`);
+                    if (sec) {
+                        if (key === tabName) sec.classList.remove('hidden');
+                        else sec.classList.add('hidden');
+                    }
+                });
+
+                if (tabName === 'orders') renderAdminOrders();
+                if (tabName === 'menu') {
+                    populateAdminCategoryDropdowns();
+                    renderAdminProducts();
+                }
+                if (tabName === 'categories') renderAdminCategories();
+                if (tabName === 'settings') populateSettingsForm();
+
+                lucide.createIcons();
+            }
+
+            // Admin Tab 1: Orders
+            function renderAdminOrders() {
+                const container = document.getElementById('admin-orders-grid');
+                const filterVal = document.getElementById('admin-orders-filter').value;
+
+                const filtered = state.orders.filter(o => filterVal === 'all' || o.status === filterVal);
+
+                if (filtered.length === 0) {
+                    container.innerHTML = `<div class="col-span-full bg-white p-12 rounded-2xl border border-stone-200 text-center text-stone-500 font-medium">Бұл бөлімде тапсырыстар жоқ</div>`;
+                    return;
+                }
+
+                const badgeStyles = {
+                    'Жаңа': 'bg-red-100 text-red-700 border-red-200',
+                    'Дайындалуда': 'bg-amber-100 text-amber-800 border-amber-200',
+                    'Жолда': 'bg-blue-100 text-blue-700 border-blue-200',
+                    'Орындалды': 'bg-emerald-100 text-emerald-700 border-emerald-200',
+                    'Бас тартылды': 'bg-stone-200 text-stone-700 border-stone-300'
+                };
+
+                container.innerHTML = filtered.map(function(order) {
+                    const itemsList = order.items.map(function(it) {
+                        return `<div class="flex justify-between text-sm"><span>${escapeHtml(it.name)} <strong>×${it.qty}</strong></span><span class="font-semibold">${formatPrice(it.finalPrice * it.qty)}</span></div>`;
+                    }).join('');
+
+                    return `
+                        <div class="bg-white rounded-2xl border ${order.status === 'Жаңа' ? 'border-brand-500 ring-2 ring-brand-500/10' : 'border-stone-200'} p-5 shadow-xs flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-start justify-between gap-2 pb-3 border-b border-stone-100">
+                                    <div>
+                                        <div class="flex items-center gap-2">
+                                            <span class="font-extrabold text-base text-slateDark">Тапсырыс #${order.id}</span>
+                                            <span class="text-xs text-stone-400">${escapeHtml(order.createdAt)}</span>
+                                        </div>
+                                        <p class="text-sm font-bold text-stone-800 mt-1">${escapeHtml(order.customerName)} • <a href="tel:${escapeHtml(order.phone)}" class="text-brand-600 underline">${escapeHtml(order.phone)}</a></p>
+                                    </div>
+                                    <span class="px-2.5 py-1 rounded-lg text-xs font-bold border ${badgeStyles[order.status] || 'bg-stone-100'}">${escapeHtml(order.status)}</span>
+                                </div>
+
+                                <div class="py-3 text-xs space-y-1 text-stone-600 border-b border-stone-100">
+                                    <p><strong class="text-slateDark">Түрі:</strong> ${escapeHtml(order.deliveryType)}</p>
+                                    <p><strong class="text-slateDark">Мекенжай:</strong> ${escapeHtml(order.address)}</p>
+                                    ${order.comment ? `<p class="bg-amber-50 text-amber-900 p-2 rounded-lg border border-amber-200 mt-1"><strong>💬 Пікір:</strong> ${escapeHtml(order.comment)}</p>` : ''}
+                                </div>
+
+                                <div class="py-3 space-y-1.5">${itemsList}</div>
+                            </div>
+
+                            <div class="pt-3 border-t border-stone-100 flex flex-wrap items-center justify-between gap-3">
+                                <div>
+                                    <span class="text-[11px] text-stone-400 block">Жалпы сома:</span>
+                                    <span class="text-lg font-extrabold text-brand-600">${formatPrice(order.total)}</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <select data-action="change-order-status" data-order-id="${order.id}"
+                                        class="px-3 py-2 bg-stone-100 hover:bg-stone-200 rounded-xl text-xs font-bold text-slateDark outline-none cursor-pointer">
+                                        <option value="Жаңа" ${order.status === 'Жаңа' ? 'selected' : ''}>🔴 Жаңа</option>
+                                        <option value="Дайындалуда" ${order.status === 'Дайындалуда' ? 'selected' : ''}>🟡 Дайындалуда</option>
+                                        <option value="Жолда" ${order.status === 'Жолда' ? 'selected' : ''}>🔵 Жолда</option>
+                                        <option value="Орындалды" ${order.status === 'Орындалды' ? 'selected' : ''}>🟢 Орындалды</option>
+                                        <option value="Бас тартылды" ${order.status === 'Бас тартылды' ? 'selected' : ''}>⚫ Бас тартылды</option>
+                                    </select>
+                                    <button type="button" data-action="delete-order" data-order-id="${order.id}" title="Өшіру"
+                                        class="p-2 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition">
+                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                lucide.createIcons();
+            }
+
+            // Admin Tab 2: Menu Items & Image Upload
+            function populateAdminCategoryDropdowns() {
+                const filterSelect = document.getElementById('admin-products-cat-filter');
+                const modalSelect = document.getElementById('edit-prod-category');
+
+                const optionsHtml = state.categories.map(function(c) {
+                    return `<option value="${escapeHtml(c.id)}">${escapeHtml(c.emoji)} ${escapeHtml(c.name)}</option>`;
+                }).join('');
+
+                if (filterSelect) {
+                    filterSelect.innerHTML = `<option value="all">Барлық категориялар</option>` + optionsHtml;
+                }
+                if (modalSelect) {
+                    modalSelect.innerHTML = optionsHtml;
+                }
+            }
+
+            function renderAdminProducts() {
+                const container = document.getElementById('admin-products-grid');
+                const search = document.getElementById('admin-products-search').value.trim().toLowerCase();
+                const catFilter = document.getElementById('admin-products-cat-filter').value;
+
+                const filtered = state.products.filter(function(p) {
+                    const matchCat = catFilter === 'all' || p.categoryId === catFilter;
+                    const matchSearch = !search || p.name.toLowerCase().includes(search);
+                    return matchCat && matchSearch;
+                });
+
+                if (filtered.length === 0) {
+                    container.innerHTML = `<div class="col-span-full bg-white p-10 rounded-2xl border border-stone-200 text-center text-stone-500">Тағамдар табылмады</div>`;
+                    return;
+                }
+
+                container.innerHTML = filtered.map(function(prod) {
+                    const cat = state.categories.find(c => c.id === prod.categoryId);
+                    const hasDiscount = Number(prod.discount) > 0;
+                    const finalPrice = getFinalPrice(prod.price, prod.discount);
+
+                    return `
+                        <div class="bg-white rounded-2xl border border-stone-200 overflow-hidden flex flex-col justify-between shadow-xs">
+                            <div>
+                                <div class="relative h-40 bg-stone-100">
+                                    <img src="${escapeHtml(prod.image || FALLBACK_FOOD_SVG)}" alt="${escapeHtml(prod.name)}"
+                                        class="admin-prod-img w-full h-full object-cover">
+                                    ${hasDiscount ? `<span class="absolute top-2.5 left-2.5 bg-red-600 text-white text-xs font-extrabold px-2.5 py-1 rounded-lg shadow">-${Number(prod.discount)}%</span>` : ''}
+                                    <span class="absolute bottom-2.5 left-2.5 bg-slateDark/80 text-white text-xs px-2.5 py-1 rounded-lg">
+                                        ${cat ? `${escapeHtml(cat.emoji)} ${escapeHtml(cat.name)}` : 'Санатсыз'}
+                                    </span>
+                                </div>
+                                <div class="p-4">
+                                    <div class="flex items-start justify-between gap-2 mb-1">
+                                        <h4 class="font-bold text-base text-slateDark">${escapeHtml(prod.name)}</h4>
+                                        ${prod.portion ? `<span class="text-[11px] bg-stone-100 text-stone-600 px-2 py-0.5 rounded">${escapeHtml(prod.portion)}</span>` : ''}
+                                    </div>
+                                    <p class="text-xs text-stone-500 line-clamp-2 mb-3">${escapeHtml(prod.description)}</p>
+                                    <div class="flex items-baseline gap-2">
+                                        <span class="text-base font-extrabold text-brand-600">${formatPrice(finalPrice)}</span>
+                                        ${hasDiscount ? `<span class="text-xs text-stone-400 line-through">${formatPrice(prod.price)}</span>` : ''}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="px-4 py-3 bg-stone-50 border-t border-stone-100 flex items-center justify-end gap-2">
+                                <button type="button" data-action="edit-product" data-id="${escapeHtml(prod.id)}"
+                                    class="px-3 py-1.5 bg-white border border-stone-200 hover:border-brand-600 text-stone-700 hover:text-brand-600 rounded-xl text-xs font-semibold flex items-center gap-1 transition">
+                                    <i data-lucide="edit-3" class="w-3.5 h-3.5"></i> Өңдеу
+                                </button>
+                                <button type="button" data-action="delete-product" data-id="${escapeHtml(prod.id)}"
+                                    class="px-3 py-1.5 bg-white border border-stone-200 hover:border-red-500 text-stone-700 hover:text-red-600 rounded-xl text-xs font-semibold flex items-center gap-1 transition">
+                                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Өшіру
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                container.querySelectorAll('.admin-prod-img').forEach(function(img) {
+                    img.addEventListener('error', function() {
+                        if (this.src !== FALLBACK_FOOD_SVG) this.src = FALLBACK_FOOD_SVG;
+                    });
+                });
+
+                lucide.createIcons();
+            }
+
+            function openProductModal(productId) {
+                populateAdminCategoryDropdowns();
+                const modal = document.getElementById('product-form-modal');
+                const heading = document.getElementById('product-modal-heading');
+                const form = document.getElementById('product-editor-form');
+                const statusEl = document.getElementById('edit-prod-img-status');
+
+                form.reset();
+                statusEl.textContent = 'JPG, PNG, WEBP қолдау көрсетіледі';
+                statusEl.className = 'text-[11px] text-stone-500';
+
+                if (productId) {
+                    const prod = state.products.find(p => p.id === productId);
+                    if (!prod) return;
+
+                    heading.textContent = 'Тағамды өңдеу';
+                    document.getElementById('edit-prod-id').value = prod.id;
+                    document.getElementById('edit-prod-name').value = prod.name;
+                    document.getElementById('edit-prod-category').value = prod.categoryId;
+                    document.getElementById('edit-prod-price').value = prod.price;
+                    document.getElementById('edit-prod-discount').value = prod.discount || 0;
+                    document.getElementById('edit-prod-portion').value = prod.portion || '';
+                    document.getElementById('edit-prod-desc').value = prod.description || '';
+                    document.getElementById('edit-prod-url').value = prod.image || '';
+                    document.getElementById('edit-prod-preview').src = prod.image || FALLBACK_FOOD_SVG;
+                } else {
+                    heading.textContent = 'Жаңа тағам қосу';
+                    document.getElementById('edit-prod-id').value = '';
+                    document.getElementById('edit-prod-discount').value = 0;
+                    document.getElementById('edit-prod-url').value = '';
+                    document.getElementById('edit-prod-preview').src = FALLBACK_FOOD_SVG;
+                }
+
+                updateProductPricePreview();
+                modal.classList.remove('hidden');
+                lucide.createIcons();
+            }
+
+            function updateProductPricePreview() {
+                const price = parseFloat(document.getElementById('edit-prod-price').value) || 0;
+                const discount = parseFloat(document.getElementById('edit-prod-discount').value) || 0;
+                const finalPrice = getFinalPrice(price, discount);
+                document.getElementById('edit-prod-final-preview').textContent = formatPrice(finalPrice);
+            }
+
+            // Image Upload with FileReader + HTML5 Canvas Resize (Max 600px, JPEG 0.8)
+            function handleProductFileUpload(event) {
+                const file = event.target.files && event.target.files[0];
+                if (!file) return;
+
+                const statusEl = document.getElementById('edit-prod-img-status');
+                const previewImg = document.getElementById('edit-prod-preview');
+                const urlInput = document.getElementById('edit-prod-url');
+
+                statusEl.textContent = 'Сурет өңделуде...';
+                statusEl.className = 'text-[11px] text-brand-600 font-semibold';
+
+                const reader = new FileReader();
+                reader.onload = function(loadEvent) {
+                    const rawBase64 = loadEvent.target.result;
+                    previewImg.src = rawBase64;
+
+                    const img = new Image();
+                    img.onload = function() {
+                        try {
+                            const MAX_DIM = 600;
+                            let width = img.width || 600;
+                            let height = img.height || 450;
+
+                            if (width > height) {
+                                if (width > MAX_DIM) {
+                                    height = Math.round((height * MAX_DIM) / width);
+                                    width = MAX_DIM;
+                                }
+                            } else {
+                                if (height > MAX_DIM) {
+                                    width = Math.round((width * MAX_DIM) / height);
+                                    height = MAX_DIM;
+                                }
+                            }
+
+                            const canvas = document.createElement('canvas');
+                            canvas.width = width;
+                            canvas.height = height;
+                            const ctx = canvas.getContext('2d');
+                            ctx.fillStyle = '#FFFFFF';
+                            ctx.fillRect(0, 0, width, height);
+                            ctx.drawImage(img, 0, 0, width, height);
+
+                            const compressedBase64 = canvas.toDataURL('image/jpeg', 0.8);
+                            urlInput.value = compressedBase64;
+                            previewImg.src = compressedBase64;
+
+                            statusEl.textContent = '✅ Сурет сәтті жүктелді!';
+                            statusEl.className = 'text-[11px] text-emerald-600 font-bold';
+                            showToast('Сурет сәтті жүктелді!', 'success');
+                        } catch (err) {
+                            urlInput.value = rawBase64;
+                            statusEl.textContent = '✅ Сурет жүктелді!';
+                            statusEl.className = 'text-[11px] text-emerald-600 font-bold';
+                        } finally {
+                            event.target.value = '';
+                        }
+                    };
+
+                    img.onerror = function() {
+                        urlInput.value = rawBase64;
+                        statusEl.textContent = '✅ Сурет жүктелді!';
+                        statusEl.className = 'text-[11px] text-emerald-600 font-bold';
+                        event.target.value = '';
+                    };
+
+                    img.src = rawBase64;
+                };
+
+                reader.onerror = function() {
+                    statusEl.textContent = '❌ Суретті оқу кезінде қате шықты.';
+                    statusEl.className = 'text-[11px] text-red-600 font-semibold';
+                    showToast('Суретті жүктеу қатесі', 'error');
+                    event.target.value = '';
+                };
+
+                reader.readAsDataURL(file);
+            }
+
+            function handleSaveProduct(event) {
+                event.preventDefault();
+                const id = document.getElementById('edit-prod-id').value;
+                const name = document.getElementById('edit-prod-name').value.trim();
+                const categoryId = document.getElementById('edit-prod-category').value;
+                const price = parseInt(document.getElementById('edit-prod-price').value, 10) || 0;
+                const discount = Math.min(90, Math.max(0, parseInt(document.getElementById('edit-prod-discount').value, 10) || 0));
+                const portion = document.getElementById('edit-prod-portion').value.trim();
+                const description = document.getElementById('edit-prod-desc').value.trim();
+                const image = document.getElementById('edit-prod-url').value.trim() || FALLBACK_FOOD_SVG;
+
+                const backup = state.products.slice();
+
+                if (id) {
+                    const idx = state.products.findIndex(p => p.id === id);
+                    if (idx !== -1) {
+                        state.products[idx] = { id, name, categoryId, price, discount, portion, description, image };
+                    }
+                } else {
+                    state.products.unshift({
+                        id: 'prod_' + Date.now(),
+                        name,
+                        categoryId,
+                        price,
+                        discount,
+                        portion,
+                        description,
+                        image
+                    });
+                }
+
+                if (safeWriteStorage(STORAGE.PRODUCTS, state.products)) {
+                    document.getElementById('product-form-modal').classList.add('hidden');
+                    renderAdminProducts();
+                    showToast(id ? 'Тағам сәтті жаңартылды!' : 'Жаңа тағам қосылды!', 'success');
+                } else {
+                    state.products = backup;
+                }
+            }
+
+            // Admin Tab 3: Categories
+            function renderAdminCategories() {
+                const listEl = document.getElementById('admin-categories-list');
+                listEl.innerHTML = state.categories.map(function(cat) {
+                    const count = state.products.filter(p => p.categoryId === cat.id).length;
+                    return `
+                        <div class="flex items-center justify-between p-3.5 bg-stone-50 rounded-xl border border-stone-200/80">
+                            <div class="flex items-center gap-3">
+                                <span class="text-2xl">${escapeHtml(cat.emoji || '🍽️')}</span>
+                                <div>
+                                    <h4 class="font-bold text-sm text-slateDark">${escapeHtml(cat.name)}</h4>
+                                    <span class="text-xs text-stone-500">${count} тағам бар</span>
+                                </div>
+                            </div>
+                            <button type="button" data-action="delete-category" data-id="${escapeHtml(cat.id)}"
+                                class="p-2 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition" title="Өшіру">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    `;
+                }).join('');
+
+                lucide.createIcons();
+            }
+
+            function handleAddCategory(event) {
+                event.preventDefault();
+                const nameInput = document.getElementById('new-category-name');
+                const name = nameInput.value.trim();
+                const emoji = document.getElementById('selected-category-emoji').value || '🍽️';
+                if (!name) return;
+
+                state.categories.push({
+                    id: 'cat_' + Date.now(),
+                    name: name,
+                    emoji: emoji
+                });
+
+                safeWriteStorage(STORAGE.CATEGORIES, state.categories);
+                nameInput.value = '';
+                renderAdminCategories();
+                showToast(`«${name}» категориясы қосылды!`, 'success');
+            }
+
+            // Admin Tab 4: Settings
+            function populateSettingsForm() {
+                document.getElementById('setting-cafe-name').value = state.settings.name || '';
+                document.getElementById('setting-cafe-tagline').value = state.settings.tagline || '';
+                document.getElementById('setting-whatsapp').value = cleanWhatsAppDigits(state.settings.whatsapp);
+                document.getElementById('setting-hours').value = state.settings.hours || '09:00 - 23:00';
+                document.getElementById('setting-admin-pin').value = state.settings.adminPin || '1234';
+            }
+
+            function handleSaveSettings(event) {
+                event.preventDefault();
+                state.settings = {
+                    name: document.getElementById('setting-cafe-name').value.trim(),
+                    tagline: document.getElementById('setting-cafe-tagline').value.trim(),
+                    whatsapp: cleanWhatsAppDigits(document.getElementById('setting-whatsapp').value),
+                    hours: document.getElementById('setting-hours').value.trim(),
+                    adminPin: document.getElementById('setting-admin-pin').value.trim()
+                };
+                safeWriteStorage(STORAGE.SETTINGS, state.settings);
+                renderSettingsToUI();
+                showToast('Баптаулар сәтті сақталды!', 'success');
+            }
+
+            // Global Event Delegation & Form Listeners
+            function bindEvents() {
+                // Click Event Delegation
+                document.addEventListener('click', function(event) {
+                    // Admin Tab Buttons
+                    const tabBtn = event.target.closest('[data-admin-tab]');
+                    if (tabBtn) {
+                        switchAdminTab(tabBtn.getAttribute('data-admin-tab'));
+                        return;
+                    }
+
+                    // Emoji Picker Buttons
+                    const emojiBtn = event.target.closest('.emoji-choice');
+                    if (emojiBtn) {
+                        const emoji = emojiBtn.getAttribute('data-emoji');
+                        document.getElementById('selected-category-emoji').value = emoji;
+                        document.querySelectorAll('.emoji-choice').forEach(function(b) {
+                            b.classList.remove('border-2', 'border-brand-600', 'bg-brand-50');
+                            b.classList.add('border', 'border-stone-200');
+                        });
+                        emojiBtn.classList.remove('border', 'border-stone-200');
+                        emojiBtn.classList.add('border-2', 'border-brand-600', 'bg-brand-50');
+                        return;
+                    }
+
+                    // General Data-Action Buttons
+                    const actionEl = event.target.closest('[data-action]');
+                    if (!actionEl) return;
+
+                    const action = actionEl.getAttribute('data-action');
+                    const id = actionEl.getAttribute('data-id');
+
+                    switch (action) {
+                        case 'select-category':
+                            state.selectedCategory = id;
+                            renderCategoryPills();
+                            renderMenuGrid();
+                            break;
+                        case 'reset-filters':
+                            state.selectedCategory = 'all';
+                            state.searchQuery = '';
+                            document.getElementById('desktop-search-input').value = '';
+                            document.getElementById('mobile-search-input').value = '';
+                            renderCategoryPills();
+                            renderMenuGrid();
+                            break;
+                        case 'add-to-cart':
+                            addToCart(id);
+                            break;
+                        case 'inc-cart':
+                            changeCartQty(id, 1);
+                            break;
+                        case 'dec-cart':
+                            changeCartQty(id, -1);
+                            break;
+                        case 'remove-cart':
+                            removeCartItem(id);
+                            break;
+                        case 'open-cart':
+                            toggleCartDrawer(true);
+                            break;
+                        case 'close-cart':
+                            toggleCartDrawer(false);
+                            break;
+                        case 'close-confirm-modal':
+                            document.getElementById('order-confirm-modal').classList.add('hidden');
+                            break;
+                        case 'open-admin-login':
+                            openAdminLogin();
+                            break;
+                        case 'close-admin-login':
+                            document.getElementById('admin-login-modal').classList.add('hidden');
+                            break;
+                        case 'exit-admin':
+                            exitAdminView();
+                            break;
+                        case 'open-add-product':
+                            openProductModal(null);
+                            break;
+                        case 'edit-product':
+                            openProductModal(id);
+                            break;
+                        case 'delete-product':
+                            state.products = state.products.filter(p => p.id !== id);
+                            safeWriteStorage(STORAGE.PRODUCTS, state.products);
+                            renderAdminProducts();
+                            showToast('Тағам өшірілді', 'info');
+                            break;
+                        case 'close-product-modal':
+                            document.getElementById('product-form-modal').classList.add('hidden');
+                            break;
+                        case 'delete-order': {
+                            const orderId = Number(actionEl.getAttribute('data-order-id'));
+                            state.orders = state.orders.filter(o => o.id !== orderId);
+                            safeWriteStorage(STORAGE.ORDERS, state.orders);
+                            renderAdminOrders();
+                            updateNewOrdersBadges();
+                            showToast(`Тапсырыс #${orderId} өшірілді`, 'info');
+                            break;
+                        }
+                        case 'delete-category':
+                            if (state.categories.length <= 1) {
+                                showToast('Кем дегенде бір категория қалуы керек!', 'error');
+                                return;
+                            }
+                            state.categories = state.categories.filter(c => c.id !== id);
+                            safeWriteStorage(STORAGE.CATEGORIES, state.categories);
+                            renderAdminCategories();
+                            showToast('Категория өшірілді', 'info');
+                            break;
+                        case 'reset-demo-data':
+                            localStorage.removeItem(STORAGE.SETTINGS);
+                            localStorage.removeItem(STORAGE.CATEGORIES);
+                            localStorage.removeItem(STORAGE.PRODUCTS);
+                            localStorage.removeItem(STORAGE.ORDERS);
+                            localStorage.removeItem(STORAGE.CART);
+                            initState();
+                            renderSettingsToUI();
+                            switchAdminTab('orders');
+                            showToast('Демо деректер қалпына келтірілді', 'info');
+                            break;
+                    }
+                });
+
+                // Change Event Delegation
+                document.addEventListener('change', function(event) {
+                    const target = event.target;
+
+                    // Delivery vs Pickup toggle
+                    if (target.name === 'deliveryType') {
+                        const addrGroup = document.getElementById('order-address-group');
+                        const addrInput = document.getElementById('order-cust-address');
+                        if (target.value === 'Жеткізу') {
+                            addrGroup.classList.remove('hidden');
+                            addrInput.required = true;
+                        } else {
+                            addrGroup.classList.add('hidden');
+                            addrInput.required = false;
+                        }
+                        return;
+                    }
+
+                    // Order Status Dropdown
+                    if (target.getAttribute('data-action') === 'change-order-status') {
+                        const orderId = Number(target.getAttribute('data-order-id'));
+                        const order = state.orders.find(o => o.id === orderId);
+                        if (order) {
+                            order.status = target.value;
+                            safeWriteStorage(STORAGE.ORDERS, state.orders);
+                            renderAdminOrders();
+                            updateNewOrdersBadges();
+                            showToast(`Тапсырыс #${orderId} мәртебесі өзгертілді`, 'success');
+                        }
+                        return;
+                    }
+
+                    // Admin Filter Selects
+                    if (target.id === 'admin-orders-filter') {
+                        renderAdminOrders();
+                        return;
+                    }
+                    if (target.id === 'admin-products-cat-filter') {
+                        renderAdminProducts();
+                        return;
+                    }
+
+                    // Product Image File Input
+                    if (target.id === 'edit-prod-file') {
+                        handleProductFileUpload(event);
+                    }
+                });
+
+                // Input Event Listeners
+                const desktopSearch = document.getElementById('desktop-search-input');
+                const mobileSearch = document.getElementById('mobile-search-input');
+
+                function onSearchInput(val) {
+                    state.searchQuery = val.trim().toLowerCase();
+                    desktopSearch.value = val;
+                    mobileSearch.value = val;
+                    renderMenuGrid();
+                }
+
+                desktopSearch.addEventListener('input', function() { onSearchInput(this.value); });
+                mobileSearch.addEventListener('input', function() { onSearchInput(this.value); });
+
+                document.getElementById('admin-products-search').addEventListener('input', renderAdminProducts);
+                document.getElementById('edit-prod-price').addEventListener('input', updateProductPricePreview);
+                document.getElementById('edit-prod-discount').addEventListener('input', updateProductPricePreview);
+                document.getElementById('edit-prod-url').addEventListener('input', function() {
+                    const url = this.value.trim();
+                    document.getElementById('edit-prod-preview').src = url || FALLBACK_FOOD_SVG;
+                });
+
+                document.getElementById('edit-prod-preview').addEventListener('error', function() {
+                    if (this.src !== FALLBACK_FOOD_SVG) this.src = FALLBACK_FOOD_SVG;
+                });
+
+                // Form Submissions
+                document.getElementById('checkout-form').addEventListener('submit', handleCheckoutSubmit);
+                document.getElementById('admin-login-form').addEventListener('submit', handleAdminPinSubmit);
+                document.getElementById('product-editor-form').addEventListener('submit', handleSaveProduct);
+                document.getElementById('admin-add-category-form').addEventListener('submit', handleAddCategory);
+                document.getElementById('admin-settings-form').addEventListener('submit', handleSaveSettings);
+            }
+
+            // Bootstrap Application
+            document.addEventListener('DOMContentLoaded', function() {
+                initState();
+                bindEvents();
+                renderSettingsToUI();
+                renderCategoryPills();
+                renderMenuGrid();
+                renderCartUI();
+                updateNewOrdersBadges();
+                lucide.createIcons();
+            });
+        })();
+    </script>
+</body>
+</html>
